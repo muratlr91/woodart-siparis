@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#173b2a" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="woodart-icon.svg" />
   <title>Woodart | Yönetim Paneli</title>
   <style>
     :root { --forest:#173b2a; --wood:#a66c3b; --cream:#f7f4ee; --ink:#24312a; --line:#e5e1d7; --soft:#edf2ed; --red:#b34b40; }
@@ -220,4 +223,5 @@
   renderCostStocks();
   render();
 </script>
+<script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
 </body></html>
