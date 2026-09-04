@@ -255,28 +255,24 @@
 </script>
 <script>
   (()=>{
-    const stockTools=document.querySelector('#stok .panel-head .tools');
-    if(!stockTools||document.querySelector('#manage-categories'))return;
-    const categoryButton=document.createElement('button');
-    categoryButton.id='manage-categories';categoryButton.type='button';categoryButton.className='action';categoryButton.textContent='Kategoriler';
-    stockTools.prepend(categoryButton);
-    const categories=()=>[...new Set((data.stock||[]).map(item=>String(item.category||'Diğer').trim()||'Diğer'))].sort((a,b)=>a.localeCompare(b,'tr'));
-    const openCategories=()=>{
-      activeType='categoryManager';editIndex=-1;
-      document.querySelector('#modal').querySelector('.modal').classList.remove('wide');
-      document.querySelector('#modal-title').textContent='Kategori yönetimi';
-      document.querySelector('#entry-form button[type="submit"]').style.display='none';
-      document.querySelector('#form-fields').innerHTML=`<p class="muted">Bir kategori silinirse o kategorideki ürünler korunur ve “Diğer” kategorisine taşınır.</p><div class="panel" style="margin-top:12px">${categories().map(category=>`<div class="setting"><strong>${category}</strong>${category==='Diğer'?'<span class="muted">Varsayılan kategori</span>':`<button type="button" class="row-action delete" data-delete-category="${category.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">Sil</button>`}</div>`).join('')||'<p class="muted">Henüz kategori yok.</p>'}</div>`;
-      document.querySelector('#modal').classList.add('show');
+    document.querySelector('#stock-category-tabs')?.remove();
+    document.querySelector('#stock-categories-panel')?.remove();
+    const page=document.querySelector('#stok'),stockPanel=page?.querySelector('.panel');if(!page||!stockPanel)return;
+    const tabs=document.createElement('div'),categoryPanel=document.createElement('div');
+    tabs.id='stock-category-tabs';tabs.className='cost-tabs';tabs.innerHTML='<button class="cost-tab active" data-stock-view="list">Stok listesi</button><button class="cost-tab" data-stock-view="categories">Kategoriler</button>';
+    categoryPanel.id='stock-categories-panel';categoryPanel.className='panel';categoryPanel.style.display='none';stockPanel.before(tabs);stockPanel.after(categoryPanel);
+    let selected='';
+    const categoryNames=()=>[...new Set([...(data.categories||[]),...(data.stock||[]).map(item=>String(item.category||'').trim()).filter(Boolean)])].filter(Boolean).sort((a,b)=>a.localeCompare(b,'tr'));
+    const draw=()=>{
+      const pageTop=window.scrollY,previousScroll=categoryPanel.querySelector('.category-stock-scroll')?.scrollTop||0,names=categoryNames();
+      if(selected&&!names.includes(selected))selected='';
+      const available=(data.stock||[]).map((stock,index)=>({stock,index})).filter(({stock})=>!String(stock.category||'').trim()||String(stock.category||'').trim()===selected);
+      categoryPanel.innerHTML=`<div class="panel-head"><h2>Kategoriler</h2><div class="tools"><input id="new-stock-category" placeholder="Yeni kategori adı"><button class="action" data-add-stock-category>+ Kategori ekle</button></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">${names.map(name=>`<button class="action" data-open-stock-category="${name}" style="${selected===name?'background:var(--forest);color:#fff':''}">${name}</button>`).join('')||'<span class="muted">Henüz kategori eklenmedi.</span>'}</div>${selected?`<div class="order-selected"><div class="panel-head"><h3>${selected} kategorisindeki stoklar</h3><button class="row-action delete" data-delete-stock-category>Seçili kategoriyi sil</button></div><div class="category-stock-scroll" style="max-height:360px;overflow:auto"><table><thead><tr><th>Seç</th><th>Görsel</th><th>Stok kodu</th><th>Stok adı</th><th>Birim</th><th>Mevcut</th></tr></thead><tbody>${available.map(({stock,index})=>`<tr><td><input type="checkbox" data-category-stock="${index}" ${String(stock.category||'').trim()===selected?'checked':''}></td><td><img src="${stock.image||'stok-urunleri.png'}" alt="" style="width:38px;height:28px;object-fit:cover;border-radius:4px"></td><td>${stock.code}</td><td>${stock.name}</td><td>${stock.unit}</td><td>${stock.count}</td></tr>`).join('')||'<tr><td colspan="6" class="muted">Bu kategoriye atanacak stok kalmadı.</td></tr>'}</tbody></table></div></div>`:'<p class="muted">Bir kategoriye tıklayın; işaretlediğiniz stoklar yalnızca o kategoriye atanır.</p>'}`;
+      requestAnimationFrame(()=>{window.scrollTo({top:pageTop,left:0,behavior:'instant'});const holder=categoryPanel.querySelector('.category-stock-scroll');if(holder)holder.scrollTop=previousScroll});
     };
-    categoryButton.onclick=openCategories;
-    document.addEventListener('click',event=>{
-      const button=event.target.closest('[data-delete-category]');if(!button)return;
-      const category=button.dataset.deleteCategory;
-      if(!confirm(`“${category}” kategorisi silinsin mi? Bu ürünler “Diğer” kategorisine taşınacak.`))return;
-      data.stock.forEach(item=>{if(String(item.category||'Diğer').trim()===category)item.category='Diğer'});
-      data.categories=categories();save();render();renderCostStocks();openCategories();showToast('Kategori silindi; ürünler Diğer kategorisine taşındı.');
-    },true);
+    tabs.addEventListener('click',event=>{const button=event.target.closest('[data-stock-view]');if(!button)return;tabs.querySelectorAll('button').forEach(item=>item.classList.remove('active'));button.classList.add('active');const showCategories=button.dataset.stockView==='categories';stockPanel.style.display=showCategories?'none':'';categoryPanel.style.display=showCategories?'':'none';if(showCategories)draw()});
+    categoryPanel.addEventListener('click',event=>{const add=event.target.closest('[data-add-stock-category]'),open=event.target.closest('[data-open-stock-category]'),remove=event.target.closest('[data-delete-stock-category]');if(add){const input=categoryPanel.querySelector('#new-stock-category'),name=input.value.trim();if(!name){showToast('Kategori adı girin.');return}if(categoryNames().includes(name)){showToast('Bu kategori zaten var.');return}data.categories=[...categoryNames(),name];selected=name;save();draw();return}if(open){selected=open.dataset.openStockCategory;draw();return}if(remove){if(!confirm(`“${selected}” kategorisi silinsin mi? Bu kategorideki ürünler boşa alınacak.`))return;data.stock.forEach(stock=>{if(String(stock.category||'').trim()===selected)stock.category=''});data.categories=categoryNames().filter(name=>name!==selected);selected='';save();draw();showToast('Kategori silindi.')}});
+    categoryPanel.addEventListener('change',event=>{const check=event.target.closest('[data-category-stock]');if(!check)return;const stock=data.stock[Number(check.dataset.categoryStock)];stock.category=check.checked?selected:'';save();showToast(check.checked?'Stok kategoriye eklendi.':'Stok kategoriden çıkarıldı.')});
   })();
 </script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
