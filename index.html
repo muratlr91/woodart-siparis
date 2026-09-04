@@ -42,6 +42,9 @@
     (()=>{const holder=document.querySelector('#products');if(!holder)return;const reveal=()=>{holder.classList.remove('woodart-remote-loading');observer.disconnect();clearTimeout(fallback)};const observer=new MutationObserver(()=>reveal());observer.observe(holder,{childList:true});const fallback=setTimeout(reveal,10000)})();
   </script>
   <script>
+    (()=>{document.addEventListener('click',event=>{if(!event.target.closest('[data-add]'))return;const pageTop=window.scrollY,list=document.querySelector('#products'),listTop=list?.scrollTop||0;setTimeout(()=>{window.scrollTo({top:pageTop,left:0,behavior:'instant'});if(list)list.scrollTop=listTop},0)},true)})();
+  </script>
+  <script>
     (()=>{
       const lightbox=document.querySelector('#gallery-lightbox');
       const image=lightbox?.querySelector('img'),caption=lightbox?.querySelector('.gallery-caption');

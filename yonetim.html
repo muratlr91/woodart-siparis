@@ -253,6 +253,32 @@
   const renderWithGold=render;render=function(){renderWithGold();goldPanel()};
   if(window.__woodartRemoteLoading){const main=document.querySelector('main');if(main){main.style.opacity='0';main.style.pointerEvents='none'}}else render();
 </script>
+<script>
+  (()=>{
+    const stockTools=document.querySelector('#stok .panel-head .tools');
+    if(!stockTools||document.querySelector('#manage-categories'))return;
+    const categoryButton=document.createElement('button');
+    categoryButton.id='manage-categories';categoryButton.type='button';categoryButton.className='action';categoryButton.textContent='Kategoriler';
+    stockTools.prepend(categoryButton);
+    const categories=()=>[...new Set((data.stock||[]).map(item=>String(item.category||'Diğer').trim()||'Diğer'))].sort((a,b)=>a.localeCompare(b,'tr'));
+    const openCategories=()=>{
+      activeType='categoryManager';editIndex=-1;
+      document.querySelector('#modal').querySelector('.modal').classList.remove('wide');
+      document.querySelector('#modal-title').textContent='Kategori yönetimi';
+      document.querySelector('#entry-form button[type="submit"]').style.display='none';
+      document.querySelector('#form-fields').innerHTML=`<p class="muted">Bir kategori silinirse o kategorideki ürünler korunur ve “Diğer” kategorisine taşınır.</p><div class="panel" style="margin-top:12px">${categories().map(category=>`<div class="setting"><strong>${category}</strong>${category==='Diğer'?'<span class="muted">Varsayılan kategori</span>':`<button type="button" class="row-action delete" data-delete-category="${category.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">Sil</button>`}</div>`).join('')||'<p class="muted">Henüz kategori yok.</p>'}</div>`;
+      document.querySelector('#modal').classList.add('show');
+    };
+    categoryButton.onclick=openCategories;
+    document.addEventListener('click',event=>{
+      const button=event.target.closest('[data-delete-category]');if(!button)return;
+      const category=button.dataset.deleteCategory;
+      if(!confirm(`“${category}” kategorisi silinsin mi? Bu ürünler “Diğer” kategorisine taşınacak.`))return;
+      data.stock.forEach(item=>{if(String(item.category||'Diğer').trim()===category)item.category='Diğer'});
+      data.categories=categories();save();render();renderCostStocks();openCategories();showToast('Kategori silindi; ürünler Diğer kategorisine taşındı.');
+    },true);
+  })();
+</script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
 <script>(()=>{const titles={ozet:'Özet Görüntü',kasa:'Kasa Hareketleri',cari:'Cari Listesi',stok:'Stok Listesi',siparis:'Siparişler',satinalma:'Satınalma',fiyat:'Maliyet hesabı',ayarlar:'Ayarlar & Yedekleme'};document.querySelectorAll('nav button[data-page]').forEach(button=>button.addEventListener('click',()=>{const page=button.dataset.page;document.querySelectorAll('nav button,.page').forEach(element=>element.classList.remove('active'));button.classList.add('active');document.getElementById(page)?.classList.add('active');const title=document.querySelector('#page-title');if(title)title.textContent=titles[page]||'Woodart'}))})();</script>
 </body></html>
