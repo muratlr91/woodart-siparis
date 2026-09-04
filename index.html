@@ -15,6 +15,7 @@
     .products.woodart-remote-loading{display:block;padding:54px 12px;text-align:center;color:#67756c}
     .products.woodart-remote-loading>*{display:none}
     .products.woodart-remote-loading::after{content:'Güncel ürünler yükleniyor…';font-weight:700}
+    .product-add-qty{width:58px;padding:7px 5px;margin:8px 6px 0 0;border:1px solid var(--forest);border-radius:7px;text-align:center;font:inherit}.product-add-qty::-webkit-inner-spin-button{opacity:1}@media(max-width:520px){.catalog-tools{grid-template-columns:minmax(0,1fr) 94px 94px;gap:8px}.catalog-tools input,.catalog-tools select{min-width:0;padding:10px 8px;font-size:13px}.product{grid-template-columns:68px minmax(0,1fr);gap:10px;align-items:start}.product-photo,.product-photo img{width:68px;height:58px}.product h3{overflow-wrap:anywhere}.product small{overflow-wrap:anywhere;line-height:1.35}.product .add{max-width:100%;padding:7px 9px;font-size:14px}.product-add-qty{width:52px;margin-right:4px}}
   </style>
 </head>
 <body>
@@ -43,6 +44,9 @@
   </script>
   <script>
     (()=>{document.addEventListener('click',event=>{if(!event.target.closest('[data-add]'))return;const pageTop=window.scrollY,list=document.querySelector('#products'),listTop=list?.scrollTop||0;setTimeout(()=>{window.scrollTo({top:pageTop,left:0,behavior:'instant'});if(list)list.scrollTop=listTop},0)},true)})();
+  </script>
+  <script>
+    (()=>{const holder=document.querySelector('#products');if(!holder)return;const decorate=()=>holder.querySelectorAll('[data-add]').forEach(button=>{if(button.parentElement?.querySelector('[data-add-qty]'))return;const input=document.createElement('input');input.type='number';input.min='1';input.step='1';input.value='1';input.inputMode='numeric';input.className='product-add-qty';input.dataset.addQty=button.dataset.add;input.setAttribute('aria-label','Adet');button.before(input)});new MutationObserver(decorate).observe(holder,{childList:true});decorate();document.addEventListener('click',event=>{const button=event.target.closest('[data-add]');if(!button)return;event.preventDefault();event.stopImmediatePropagation();const product=products[Number(button.dataset.add)],input=button.parentElement?.querySelector('[data-add-qty]'),quantity=Math.max(1,Math.floor(Number(input?.value)||1)),row=cart.find(item=>item.code===product.code);if(row)row.qty+=quantity;else cart.push({...product,qty:quantity});render()},true)})();
   </script>
   <script>
     (()=>{
