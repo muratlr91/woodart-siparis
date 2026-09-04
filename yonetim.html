@@ -234,4 +234,5 @@
   render();
 </script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
+<script>(()=>{const titles={ozet:'Özet Görüntü',kasa:'Kasa Hareketleri',cari:'Cari Listesi',stok:'Stok Listesi',siparis:'Siparişler',satinalma:'Satınalma',fiyat:'Maliyet hesabı',ayarlar:'Ayarlar & Yedekleme'};document.querySelectorAll('nav button[data-page]').forEach(button=>button.addEventListener('click',()=>{const page=button.dataset.page;document.querySelectorAll('nav button,.page').forEach(element=>element.classList.remove('active'));button.classList.add('active');document.getElementById(page)?.classList.add('active');const title=document.querySelector('#page-title');if(title)title.textContent=titles[page]||'Woodart'}))})();</script>
 </body></html>
