@@ -3,7 +3,7 @@
   "name": "Woodart Yönetim Paneli",
   "short_name": "Woodart Yönetim",
   "description": "Woodart stok, sipariş ve yönetim paneli",
-  "start_url": "/woodart-siparis/yonetim-v2/",
+  "start_url": "/woodart-siparis/yonetim-v2/index.html",
   "scope": "/woodart-siparis/yonetim-v2/",
   "display": "standalone",
   "background_color": "#f7f4ee",
