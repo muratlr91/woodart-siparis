@@ -8,5 +8,12 @@
 <title>Woodart Yönetim</title>
 <style>html,body{margin:0;width:100%;height:100%;background:#f7f4ee}iframe{display:block;width:100%;height:100%;border:0}</style>
 </head>
-<body><iframe src="../yonetim.html?telefon-yonetim=2" title="Woodart Yönetim Paneli"></iframe><script>if("serviceWorker"in navigator)navigator.serviceWorker.register("service-worker.js")</script></body>
+<body>
+<iframe id="yonetim-paneli" src="../yonetim.html?telefon-yonetim=3" title="Woodart Yönetim Paneli"></iframe>
+<script>
+if("serviceWorker" in navigator)navigator.serviceWorker.register("service-worker.js");
+const panel=document.getElementById("yonetim-paneli");
+panel.addEventListener("load",()=>{try{const stil=panel.contentDocument.createElement("link");stil.rel="stylesheet";stil.href=new URL("mobil.css?surum=2",location.href).href;panel.contentDocument.head.append(stil)}catch(e){}});
+</script>
+</body>
 </html>
