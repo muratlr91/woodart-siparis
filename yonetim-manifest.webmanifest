@@ -1,0 +1,12 @@
+{
+  "id": "/woodart-siparis/yonetim.html",
+  "name": "Woodart Yönetim Paneli",
+  "short_name": "Woodart Yönetim",
+  "description": "Woodart stok, sipariş ve yönetim paneli",
+  "start_url": "/woodart-siparis/yonetim.html?uygulama=1",
+  "scope": "/woodart-siparis/",
+  "display": "standalone",
+  "background_color": "#f7f4ee",
+  "theme_color": "#173b2a",
+  "icons": [{"src":"woodart-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
