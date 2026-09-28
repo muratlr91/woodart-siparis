@@ -353,6 +353,14 @@
   document.addEventListener('click',event=>{const button=event.target.closest('[data-delete="stock"]');if(!button)return;event.stopImmediatePropagation();const index=Number(button.dataset.index),stock=data.stock[index];if(!stock||!confirm('Bu stok kartı silinsin mi? Görselleri de Supabase Storage’dan kaldırılacak.'))return;const paths=[...productImages(stock),...productThumbs(stock)].map(pathOf).filter(Boolean);data.stock.splice(index,1);save();render();void deletePaths(paths);showToast('Stok kartı ve bağlı görseller silindi.')},true);
 })();
 </script>
+<script>
+(()=>{
+  const githubImageCodes=new Set([...Array(90)].map((_,index)=>`ST-${String(index+1).padStart(3,'0')}`).filter(code=>code!=='ST-061').concat('ST-292'));
+  const githubImageUrl=code=>`https://muratlr91.github.io/woodart-siparis/images/urunler/${encodeURIComponent(code)}.webp`;
+  const addGithubImageLinkButton=()=>{const tools=document.querySelector('#stok .panel-head .tools');if(!tools||document.querySelector('#link-github-product-images'))return;const button=document.createElement('button');button.id='link-github-product-images';button.type='button';button.className='action';button.textContent='GitHub görsellerini bağla';button.title='Koduyla eşleşen GitHub WebP görsellerini stok kartlarına bağlar.';button.onclick=()=>{const matches=data.stock.filter(stock=>githubImageCodes.has(String(stock.code||'').toUpperCase()));if(!matches.length){showToast('GitHub arşivinde eşleşen stok kodu bulunamadı.');return}if(!confirm(`${matches.length} stok kartının kapak görseli GitHub’daki WebP dosyasıyla bağlansın mı? Eski görseller silinmez.`))return;matches.forEach(stock=>{const image=githubImageUrl(String(stock.code).toUpperCase()),images=(stock.images?.length?stock.images:[stock.image].filter(Boolean));images[0]=image;stock.image=image;stock.images=images;stock.thumbnails=[]});save();render();showToast(`${matches.length} ürün görseli GitHub bağlantısına geçirildi.`)};tools.appendChild(button)};
+  const renderWithGithubImageLink=render;render=function(){renderWithGithubImageLink();addGithubImageLinkButton()};addGithubImageLinkButton();
+})();
+</script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
 <script>(()=>{const titles={ozet:'Özet Görüntü',kasa:'Kasa Hareketleri',cari:'Cari Listesi',stok:'Stok Listesi',siparis:'Siparişler',satinalma:'Satınalma',fiyat:'Maliyet hesabı',ayarlar:'Ayarlar & Yedekleme'};document.querySelectorAll('nav button[data-page]').forEach(button=>button.addEventListener('click',()=>{const page=button.dataset.page;document.querySelectorAll('nav button,.page').forEach(element=>element.classList.remove('active'));button.classList.add('active');document.getElementById(page)?.classList.add('active');const title=document.querySelector('#page-title');if(title)title.textContent=titles[page]||'Woodart'}))})();</script>
 </body></html>
