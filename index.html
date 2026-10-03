@@ -86,5 +86,17 @@
       if(!showAnnouncement()){const timer=setInterval(()=>{if(showAnnouncement())clearInterval(timer)},250);setTimeout(()=>clearInterval(timer),12000)};
     })();
   </script>
+<script>
+(()=>{
+  const logo=document.querySelector('.top .brand');
+  if(!logo||logo.dataset.artLogo)return;
+  logo.dataset.artLogo='true';
+  logo.innerHTML='<span class="art-logo-left"><b>WOOD</b><b>CANDLE</b></span><strong>ART</strong>';
+  const style=document.createElement('style');
+  style.textContent='.top .brand{display:grid!important;grid-template-columns:auto auto;gap:7px;align-items:center;min-width:116px;font-family:"Segoe Print","Bradley Hand",cursive!important;letter-spacing:.7px;line-height:1}.top .brand img{display:none}.top .brand .art-logo-left{display:grid;gap:3px}.top .brand .art-logo-left b{font-size:15px;color:#fff}.top .brand>strong{font-size:31px;line-height:.82;color:#f0bf83;font-weight:800}@media(max-width:500px){.top .brand{min-width:93px;gap:4px}.top .brand .art-logo-left b{font-size:12px}.top .brand>strong{font-size:25px}}';
+  document.head.appendChild(style);
+})();
+</script>
+<script>document.querySelector('.intro')?.remove();</script>
 </body>
 </html>

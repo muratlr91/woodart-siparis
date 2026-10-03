@@ -449,4 +449,26 @@
 </script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));</script>
 <script>(()=>{const titles={ozet:'Özet Görüntü',kasa:'Kasa Hareketleri',cari:'Cari Listesi',stok:'Stok Listesi',siparis:'Siparişler',satinalma:'Satınalma',fiyat:'Maliyet hesabı',ayarlar:'Ayarlar & Yedekleme'};document.querySelectorAll('nav button[data-page]').forEach(button=>button.addEventListener('click',()=>{const page=button.dataset.page;document.querySelectorAll('nav button,.page').forEach(element=>element.classList.remove('active'));button.classList.add('active');document.getElementById(page)?.classList.add('active');const title=document.querySelector('#page-title');if(title)title.textContent=titles[page]||'Woodart'}))})();</script>
+<script>
+(()=>{
+  const settings=document.querySelector('#ayarlar .panel');
+  const storefront=[...settings?.querySelectorAll('.setting')||[]].find(row=>row.textContent.includes('Müşteri sipariş sayfası'));
+  if(!settings||!storefront||document.querySelector('#customer-brochure-setting'))return;
+  const row=document.createElement('div');row.id='customer-brochure-setting';row.className='setting';
+  row.innerHTML='<div><strong>Müşteri broşürü</strong><span>Ürün görselleri, adları ve iletişim bilgileri ile A4 PDF oluştur</span></div><a class="action" href="brosur.html" target="_blank" rel="noopener">Broşürü aç</a>';
+  storefront.after(row);
+})();
+</script>
+<script>
+(()=>{
+  const markup='<span class="art-logo-left"><b>WOOD</b><b>CANDLE</b></span><strong>ART</strong>';
+  const sidebar=document.querySelector('aside .brand');
+  if(sidebar&&!sidebar.dataset.artLogo){sidebar.dataset.artLogo='true';sidebar.innerHTML=markup}
+  const reportBrand=document.querySelector('.stock-report-brand .brand-left');
+  if(reportBrand&&!reportBrand.dataset.artLogo){reportBrand.dataset.artLogo='true';reportBrand.innerHTML=markup}
+  const style=document.createElement('style');
+  style.textContent='aside .brand,.stock-report-brand .brand-left{display:grid!important;grid-template-columns:auto auto;gap:7px;align-items:center;min-width:116px;font-family:"Segoe Print","Bradley Hand",cursive!important;letter-spacing:.7px;line-height:1}aside .brand img,.stock-report-brand .brand-left img{display:none}aside .brand .art-logo-left,.stock-report-brand .brand-left .art-logo-left{display:grid;gap:3px}aside .brand .art-logo-left b{font-size:15px;color:#fff}.stock-report-brand .brand-left .art-logo-left b{font-size:15px;color:#173b2a}aside .brand>strong,.stock-report-brand .brand-left>strong{font-size:31px;line-height:.82;color:#f0bf83;font-weight:800}@media(max-width:720px){aside .brand{min-width:93px;gap:4px}aside .brand .art-logo-left b{font-size:12px}aside .brand>strong{font-size:25px}}';
+  document.head.appendChild(style);
+})();
+</script>
 </body></html>
