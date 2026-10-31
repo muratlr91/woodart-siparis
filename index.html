@@ -98,5 +98,24 @@
 })();
 </script>
 <script>document.querySelector('.intro')?.remove();</script>
+<script>
+(()=>{
+  const githubAssetUrl=value=>{
+    const url=String(value||'');
+    const match=url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/i);
+    return match?`https://raw.githubusercontent.com/${match[1]}/${match[2]}/${match[3]}/${match[4]}`:url;
+  };
+  const normalizeGitHubImages=()=>{
+    products.forEach(product=>{
+      if(product.image)product.image=githubAssetUrl(product.image);
+      if(Array.isArray(product.images))product.images=product.images.map(githubAssetUrl);
+      if(Array.isArray(product.thumbnails))product.thumbnails=product.thumbnails.map(githubAssetUrl);
+    });
+  };
+  const renderWithGitHubImageUrls=render;
+  render=()=>{normalizeGitHubImages();return renderWithGitHubImageUrls()};
+  normalizeGitHubImages();
+})();
+</script>
 </body>
 </html>

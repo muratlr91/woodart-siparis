@@ -532,4 +532,23 @@
   document.head.appendChild(style);
 })();
 </script>
+<script>
+(()=>{
+  const githubAssetUrl=value=>{
+    const url=String(value||'');
+    const match=url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/i);
+    return match?`https://raw.githubusercontent.com/${match[1]}/${match[2]}/${match[3]}/${match[4]}`:url;
+  };
+  const normalizeGitHubImages=()=>{
+    (data?.stock||[]).forEach(stock=>{
+      if(stock.image)stock.image=githubAssetUrl(stock.image);
+      if(Array.isArray(stock.images))stock.images=stock.images.map(githubAssetUrl);
+      if(Array.isArray(stock.thumbnails))stock.thumbnails=stock.thumbnails.map(githubAssetUrl);
+    });
+  };
+  const renderWithGitHubImageUrls=render;
+  render=function(){normalizeGitHubImages();return renderWithGitHubImageUrls()};
+  normalizeGitHubImages();
+})();
+</script>
 </body></html>
