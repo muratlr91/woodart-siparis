@@ -539,8 +539,17 @@
     const match=url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/i);
     return match?`https://raw.githubusercontent.com/${match[1]}/${match[2]}/${match[3]}/${match[4]}`:url;
   };
+  const defaultImagesByStockCode={
+    'ST-313':'https://raw.githubusercontent.com/muratlr91/woodart-siparis/main/images/urunler/ogretmenler-gunu-yildiz-odul.webp'
+  };
   const normalizeGitHubImages=()=>{
     (data?.stock||[]).forEach(stock=>{
+      const defaultImage=defaultImagesByStockCode[String(stock.code||'')];
+      if(defaultImage&&(!stock.image||stock.image==='stok-urunleri.png')){
+        stock.image=defaultImage;
+        stock.images=[defaultImage];
+        stock.thumbnails=[];
+      }
       if(stock.image)stock.image=githubAssetUrl(stock.image);
       if(Array.isArray(stock.images))stock.images=stock.images.map(githubAssetUrl);
       if(Array.isArray(stock.thumbnails))stock.thumbnails=stock.thumbnails.map(githubAssetUrl);
