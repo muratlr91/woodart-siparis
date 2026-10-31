@@ -560,4 +560,46 @@
   normalizeGitHubImages();
 })();
 </script>
+<script>
+(()=>{
+  const normalizeGitHubProductImage=value=>{
+    const url=String(value||'').trim();
+    const match=url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/i);
+    return match?`https://raw.githubusercontent.com/${match[1]}/${match[2]}/${match[3]}/${match[4]}`:url;
+  };
+  const stockModalWithGithubLink=openModal;
+  openModal=function(type,index=-1){
+    stockModalWithGithubLink(type,index);
+    if(type!=='stock')return;
+    const formFields=document.querySelector('#form-fields'),fileInput=formFields?.querySelector('input[type="file"]');
+    if(!formFields||formFields.querySelector('[name="githubImageUrl"]'))return;
+    const stock=index>=0?data.stock[index]:null,field=document.createElement('div');
+    field.className='field';
+    const label=document.createElement('label');label.textContent='GitHub görsel linki';
+    const input=document.createElement('input');
+    input.name='githubImageUrl';input.type='url';input.inputMode='url';input.placeholder='GitHub görsel bağlantısını yapıştırın';
+    input.value=stock?.image&&/githubusercontent\.com|github\.com|github\.io/i.test(stock.image)?stock.image:'';
+    const note=document.createElement('small');note.className='muted';note.textContent='GitHub dosya veya raw bağlantısını yapıştırın; sistem doğru resim bağlantısını otomatik kullanır.';
+    field.append(label,input,note);fileInput?.closest('.field')?.before(field);
+  };
+  document.addEventListener('submit',async event=>{
+    const form=event.target;
+    if(form.id!=='entry-form'||activeType!=='stock')return;
+    const link=normalizeGitHubProductImage(form.querySelector('[name="githubImageUrl"]')?.value);
+    if(!link)return;
+    if(!/^https:\/\/(?:github\.com|raw\.githubusercontent\.com|muratlr91\.github\.io)\//i.test(link)){
+      event.preventDefault();event.stopImmediatePropagation();showToast('Lütfen geçerli bir GitHub görsel bağlantısı girin.');return;
+    }
+    event.preventDefault();event.stopImmediatePropagation();
+    const current=editIndex>=0?data.stock[editIndex]:{},entry=Object.fromEntries(new FormData(form));
+    delete entry.images;delete entry.githubImageUrl;
+    entry.code=current.code||'';entry.count=Number(entry.count)||0;entry.price=Number(entry.price)||0;
+    entry.criticalLevel=Math.max(0,Number(entry.criticalLevel)||10);entry.image=link;entry.images=[link];entry.thumbnails=[];
+    entry.imagePosition=current.imagePosition||'center';entry.movements=current.movements||[{date:todayDisplay(),type:'Giriş',qty:entry.count,note:'Açılış miktarı'}];
+    ['campaign','discount','opportunity','newProduct'].forEach(name=>entry[name]=form.querySelector(`[name="${name}"]`)?.checked?'Evet':'Hayır');
+    if(editIndex>=0)data.stock[editIndex]={...current,...entry};else data.stock.unshift(entry);
+    ensureStockCodes();save();render();document.querySelector('#modal').classList.remove('show');showToast(editIndex>=0?'Stok kartı güncellendi.':'Stok kartı eklendi.');editIndex=-1;
+  },true);
+})();
+</script>
 </body></html>
