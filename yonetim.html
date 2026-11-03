@@ -204,6 +204,16 @@
       },true);
     });
   </script>
+  <script>
+    (()=>{
+      const manifest=document.querySelector('link[rel="manifest"]');
+      if(manifest)manifest.href='yonetim-manifest.webmanifest?v=1';
+      [['mobile-web-app-capable','yes'],['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','default'],['apple-mobile-web-app-title','Woodart Yönetim']].forEach(([name,content])=>{
+        if(document.querySelector(`meta[name="${name}"]`))return;
+        const meta=document.createElement('meta');meta.name=name;meta.content=content;document.head.appendChild(meta);
+      });
+    })();
+  </script>
 </head>
 <body>
 <div class="shell">
@@ -682,7 +692,7 @@
   },true);
 })();
 </script>
-<script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js?v=11'));</script>
+<script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js?v=12'));</script>
 <script>(()=>{const titles={ozet:'Özet Görüntü',kasa:'Kasa Hareketleri',cari:'Cari Listesi',stok:'Stok Listesi',siparis:'Siparişler',satinalma:'Satınalma',fiyat:'Maliyet hesabı',ayarlar:'Ayarlar & Yedekleme'};document.querySelectorAll('nav button[data-page]').forEach(button=>button.addEventListener('click',()=>{const page=button.dataset.page;document.querySelectorAll('nav button,.page').forEach(element=>element.classList.remove('active'));button.classList.add('active');document.getElementById(page)?.classList.add('active');const title=document.querySelector('#page-title');if(title)title.textContent=titles[page]||'Woodart'}))})();</script>
 <script>
 (()=>{
