@@ -607,7 +607,8 @@
   const settings=document.querySelector('#ayarlar .panel');
   if(!settings||document.querySelector('#cargo-label-setting'))return;
   const row=document.createElement('div');row.id='cargo-label-setting';row.className='setting';
-  row.innerHTML='<div><strong>Kargo etiketi</strong><span>Gönderici, alıcı, adres, desi ve ağırlık bilgileriyle A4 etiket oluştur</span></div><a class="action" href="kargo-etiketi.html" target="_blank" rel="noopener">Etiket oluştur</a>';
+  row.innerHTML='<div><strong>Kargo etiketi</strong><span>Gönderici, alıcı, adres, desi ve ağırlık bilgileriyle yatay 100 × 80 mm etiket oluştur</span></div><a class="action" href="kargo-etiketi.html" target="_blank" rel="noopener">Etiket oluştur</a>';
+  row.querySelector('a').addEventListener('click',event=>{event.currentTarget.href='kargo-etiketi.html?yenile='+Date.now()});
   settings.appendChild(row);
 })();
 </script>
