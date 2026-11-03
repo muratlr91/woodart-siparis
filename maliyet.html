@@ -54,6 +54,38 @@
       anchor.after(button);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const addTools=()=>{
+        const header=[...document.querySelectorAll('.section-head')].find(item=>item.querySelector('h2')?.textContent.includes('Stok listesi'));
+        if(!header)return;
+        if(!document.querySelector('#cost-global-search')){
+          const search=document.createElement('input');
+          search.id='cost-global-search';search.type='search';search.placeholder='Ürün veya stok kodu ara...';
+          search.style.cssText='width:260px;max-width:100%;padding:9px 11px';
+          search.addEventListener('input',()=>{
+            const term=search.value.trim().toLocaleLowerCase('tr-TR');
+            document.querySelectorAll('.cost-table tbody tr[data-code]').forEach(row=>row.style.display=!term||row.textContent.toLocaleLowerCase('tr-TR').includes(term)?'':'none');
+          });
+          header.appendChild(search);
+        }
+        const anchor=document.querySelector('#exact-sync');
+        if(anchor&&!document.querySelector('#cost-cloud-load')){
+          const button=document.createElement('button');
+          button.id='cost-cloud-load';button.type='button';button.className='button secondary';button.textContent='Buluttan güncelle';
+          button.addEventListener('click',async()=>{
+            button.disabled=true;button.textContent='Alınıyor...';
+            const ok=await window.parent?.woodartReloadCostWorkbook?.();
+            button.textContent=ok?'Güncellendi':'Önce yönetici girişi yapın';
+            if(!ok)setTimeout(()=>{button.disabled=false;button.textContent='Buluttan güncelle'},2200);
+          });
+          anchor.after(button);
+        }
+      };
+      const observer=new MutationObserver(addTools);observer.observe(document.body,{childList:true,subtree:true});addTools();
+    });
+  </script>
+  <style>@media(max-width:700px){.section-head>#cost-global-search{width:100%!important;max-width:none!important}.section-head{gap:10px!important}.cost-table td{min-width:0!important}.cost-table td>*{min-width:0!important;max-width:100%!important}}</style>
 </head>
 <body><style>.table-wrap{overflow:visible}.cost-table{min-width:0;width:100%;table-layout:fixed;font-size:11px}.cost-table th,.cost-table td{padding:6px 3px;white-space:normal;overflow-wrap:anywhere}.cost-table input,.cost-table select{min-width:0!important;width:100%;padding:6px 4px;font-size:11px}.cost-table img{width:34px;height:34px;margin:auto}.cost-table .name{min-width:0}.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(n+5):nth-child(-n+9){width:10%}.cost-table th:nth-child(n+10){width:7%}@media(max-width:850px){.wrap{padding:0 4px}.card{padding:8px}.cost-table{font-size:8px}.cost-table th,.cost-table td{padding:3px 1px}.cost-table input,.cost-table select{padding:3px 1px;font-size:9px}.cost-table img{width:22px;height:22px}}</style>
 <style>.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(5),.cost-table th:nth-child(6),.cost-table th:nth-child(7){width:10%}.cost-table th:nth-child(8),.cost-table th:nth-child(9){width:8%}.cost-table th:nth-child(10),.cost-table th:nth-child(11),.cost-table th:nth-child(12){width:8%}.cost-table th{text-align:center;line-height:1.15}.cost-table td:nth-child(1),.cost-table td:nth-child(2){text-align:center}.cost-table td:nth-child(3){text-align:left}.cost-table td:nth-child(n+4){text-align:center}.cost-table td.result{text-align:right}</style><main class="wrap">

@@ -261,6 +261,32 @@
       setTimeout(applyRemoteWorkbook,0);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const costKey='woodart-kitap121-exact-v2';
+      window.woodartReloadCostWorkbook=async()=>{
+        try{
+          const response=await cloudFetch('/rest/v1/panel_state?select=data&id=eq.1');
+          if(!response.ok)throw new Error('Bulut verisi alınamadı');
+          const rows=await response.json();
+          const workbook=rows[0]?.data?.costWorkbook;
+          if(!workbook)throw new Error('Bulutta maliyet kaydı bulunamadı');
+          localStorage.setItem(costKey,JSON.stringify(workbook));
+          const frame=document.querySelector('#fiyat iframe');
+          if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now();
+          return true;
+        }catch(error){console.warn('Maliyet verisi alınamadı',error);return false}
+      };
+    });
+  </script>
+  <style>
+    @media (max-width:700px){
+      #fiyat .panel,#fiyat [data-material-pane],#fiyat [data-cost-pane="candle"] section.panel{min-width:0!important;overflow:hidden}
+      #fiyat [data-cost-pane="excel"] iframe{width:100%!important;max-width:100%!important}
+      #laser-material-list [data-laser-material]>div:nth-child(2){grid-template-columns:1fr!important}
+      #laser-material-list [data-laser-material] .field,#laser-material-list [data-laser-material] input{min-width:0!important;width:100%!important}
+    }
+  </style>
 </head>
 <body>
 <div class="shell">
