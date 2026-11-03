@@ -86,6 +86,34 @@
     });
   </script>
   <style>@media(max-width:700px){.section-head>#cost-global-search{width:100%!important;max-width:none!important}.section-head{gap:10px!important}.cost-table td{min-width:0!important}.cost-table td>*{min-width:0!important;max-width:100%!important}}</style>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const normalize=value=>String(value||'').toLocaleLowerCase('tr-TR').trim();
+      const filter=term=>{
+        let count=0;
+        document.querySelectorAll('.cost-table tbody tr[data-code]').forEach(row=>{
+          const visible=!term||normalize(row.textContent).includes(term);
+          row.style.display=visible?'':'none';
+          if(visible)count++;
+        });
+        const note=document.querySelector('#cost-search-empty');
+        if(note)note.style.display=term&&count===0?'block':'none';
+      };
+      const setup=()=>{
+        document.querySelectorAll('#cost-search').forEach(input=>input.style.display='none');
+        const input=document.querySelector('#cost-global-search');
+        if(!input||input.dataset.fixedSearch)return;
+        input.dataset.fixedSearch='1';
+        const note=document.createElement('p');
+        note.id='cost-search-empty';note.className='note';note.textContent='Aramanızla eşleşen stok bulunamadı.';note.style.display='none';
+        input.after(note);
+        input.addEventListener('input',()=>filter(normalize(input.value)),true);
+      };
+      new MutationObserver(setup).observe(document.body,{childList:true,subtree:true});
+      setup();
+    });
+  </script>
+  <style>@media(max-width:700px){#cost-search{display:none!important}#cost-global-search{display:block!important;width:100%!important}}</style>
 </head>
 <body><style>.table-wrap{overflow:visible}.cost-table{min-width:0;width:100%;table-layout:fixed;font-size:11px}.cost-table th,.cost-table td{padding:6px 3px;white-space:normal;overflow-wrap:anywhere}.cost-table input,.cost-table select{min-width:0!important;width:100%;padding:6px 4px;font-size:11px}.cost-table img{width:34px;height:34px;margin:auto}.cost-table .name{min-width:0}.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(n+5):nth-child(-n+9){width:10%}.cost-table th:nth-child(n+10){width:7%}@media(max-width:850px){.wrap{padding:0 4px}.card{padding:8px}.cost-table{font-size:8px}.cost-table th,.cost-table td{padding:3px 1px}.cost-table input,.cost-table select{padding:3px 1px;font-size:9px}.cost-table img{width:22px;height:22px}}</style>
 <style>.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(5),.cost-table th:nth-child(6),.cost-table th:nth-child(7){width:10%}.cost-table th:nth-child(8),.cost-table th:nth-child(9){width:8%}.cost-table th:nth-child(10),.cost-table th:nth-child(11),.cost-table th:nth-child(12){width:8%}.cost-table th{text-align:center;line-height:1.15}.cost-table td:nth-child(1),.cost-table td:nth-child(2){text-align:center}.cost-table td:nth-child(3){text-align:left}.cost-table td:nth-child(n+4){text-align:center}.cost-table td.result{text-align:right}</style><main class="wrap">
