@@ -1,5 +1,5 @@
 <!doctype html><script>document.addEventListener('DOMContentLoaded',()=>document.addEventListener('click',async event=>{const button=event.target.closest?.('#woodart-refresh');if(!button)return;event.preventDefault();event.stopImmediatePropagation();button.disabled=true;button.textContent='Yenileniyor...';try{if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(item=>item.unregister()))}if('caches'in window){const names=await caches.keys();await Promise.all(names.filter(name=>name.startsWith('woodart-')).map(name=>caches.delete(name)))}}finally{location.replace('yonetim.html?sayfa=ozet&yenile='+Date.now())}},true))</script>
-<script>window.addEventListener('load',()=>{if(new URLSearchParams(location.search).get('sayfa')==='ozet')document.querySelector('[data-page="ozet"]')?.click()})</script><html lang="tr">
+<script>window.addEventListener('load',()=>{if(new URLSearchParams(location.search).get('sayfa')==='ozet')document.querySelector('[data-page="ozet"]')?.click();const frame=document.querySelector('#fiyat iframe');if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now()})</script><html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
