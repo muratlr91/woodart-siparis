@@ -33,6 +33,53 @@
     .order-list{height:235px;max-height:235px;overflow-y:auto}#order-stock-list{display:table-row-group;height:auto;overflow:visible}#order-stock-list tr{display:table-row;width:auto;table-layout:auto}#order-stock-list td{height:auto}#form-fields .field{margin:6px 0}#form-fields .order-builder{gap:10px}#form-fields .nonstock-row{margin-top:8px;padding-top:8px;gap:10px}#form-fields .order-selected{margin-top:10px;padding:10px}#stock-cost-prices{padding:11px!important}#stock-cost-prices .panel-head{margin-bottom:8px!important}#stock-cost-prices .card{padding:9px!important}#stock-cost-prices .field{margin-top:7px!important}.stock-card.product-flag{border-width:2px}.stock-card.campaign{border-color:#d69a3a}.stock-card.discount{border-color:#dc6a61}.stock-card.opportunity{border-color:#8566bd}.stock-card.new-product{border-color:#3b89bd}.stock-card-flags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.stock-card-flags span{font-size:10px;font-weight:800;border-radius:99px;padding:3px 6px}.stock-card-flags .campaign{background:#f7dfae;color:#80500c}.stock-card-flags .discount{background:#f8cbc7;color:#99352e}.stock-card-flags .opportunity{background:#dcd0f5;color:#54398b}.stock-card-flags .new-product{background:#c8e7f8;color:#1e628e}
     .material-pane[data-material-pane="plexi"],#mdf-plexi-total{display:none!important}
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const yes=value=>value==='Evet'||value==='on'||value===true;
+      const manualFlags=()=>new Map(data.stock.filter(stock=>stock.labelMode==='Manuel').map(stock=>[stock.code,{campaign:stock.campaign,discount:stock.discount,opportunity:stock.opportunity,newProduct:stock.newProduct}]));
+      const paintManualFlags=flags=>{
+        document.querySelectorAll('#stock-grid .stock-card').forEach(card=>{
+          const code=card.querySelector('.stock-card-body small')?.textContent.split(' · ')[0];
+          const values=flags.get(code);
+          if(!values)return;
+          card.classList.remove('product-flag','campaign','discount','opportunity','new-product');
+          card.querySelector('.stock-card-flags')?.remove();
+          const labels=[['campaign','Kampanyalı ürün'],['discount','İndirimli ürün'],['opportunity','Fırsat ürünü'],['new-product','Yeni ürün']].filter(([key])=>yes(values[key==='new-product'?'newProduct':key]));
+          if(!labels.length)return;
+          card.classList.add('product-flag',...labels.map(([key])=>key));
+          const tags=document.createElement('div');
+          tags.className='stock-card-flags';
+          tags.innerHTML=labels.map(([key,label])=>`<span class="${key}">${label}</span>`).join('');
+          card.querySelector('.stock-card-body')?.appendChild(tags);
+        });
+      };
+      const automaticRender=render;
+      render=function(){
+        const flags=manualFlags();
+        automaticRender();
+        flags.forEach((values,code)=>{const stock=data.stock.find(item=>item.code===code);if(stock)Object.assign(stock,values)});
+        if(flags.size)save();
+        paintManualFlags(flags);
+      };
+      const baseOpenModal=openModal;
+      openModal=function(type,index=-1){
+        baseOpenModal(type,index);
+        if(type!=='stock')return;
+        const fields=document.querySelector('#form-fields');
+        if(!fields||fields.querySelector('[name="labelMode"]'))return;
+        const mode=data.stock[index]?.labelMode||'Otomatik';
+        const field=document.createElement('div');
+        field.className='field';
+        field.innerHTML='<label>Etiket seçimi</label><select name="labelMode"><option value="Otomatik">Otomatik hesapla</option><option value="Manuel">Manuel seç</option></select><small class="muted">Manuel seçildiğinde aşağıdaki etiket işaretleri aynen korunur.</small>';
+        fields.appendChild(field);
+        field.querySelector('select').value=mode;
+        fields.addEventListener('change',event=>{
+          if(event.target.matches('[name="campaign"],[name="discount"],[name="opportunity"],[name="newProduct"]'))field.querySelector('select').value='Manuel';
+        });
+      };
+      render();
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
