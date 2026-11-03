@@ -176,6 +176,34 @@
       document.addEventListener('input',event=>{if(event.target.closest?.('[data-candle]'))setTimeout(paint,0)},true);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const key='woodart-mum-maliyet-v1';
+      const defaults={purchasePrice:170,purchaseQuantity:1000,wickCost:5,jarCost:5,mouldWater:50,waxFactor:.9,retailMultiplier:2.5,onlineMultiplier:5};
+      const number=value=>Number(value)||0;
+      const money=value=>'₺ '+number(value).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const paint=()=>{
+        const pane=document.querySelector('[data-cost-pane="candle"]');
+        const summary=pane?.querySelector('#candle-price-summary');
+        if(!summary)return;
+        let state=defaults;try{state={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+        const cost=number(state.wickCost)+number(state.jarCost)+(number(state.mouldWater)*number(state.waxFactor)*(number(state.purchasePrice)/number(state.purchaseQuantity)));
+        summary.innerHTML=`<div class="panel-head"><div><h2>Satış fiyatları</h2><span class="muted">Maliyet çarpanlarını istediğiniz zaman değiştirebilirsiniz.</span></div></div><div style="display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px"><div class="card"><small>Maliyet</small><div class="value">${money(cost)}</div></div><div class="card"><small>Minimum satış fiyatı</small><div class="value">${money(cost*number(state.retailMultiplier))}</div><label class="muted" style="display:grid;gap:4px;margin-top:8px">Maliyet çarpanı<input data-candle-price-factor="retailMultiplier" type="number" min="0" step="0.01" value="${state.retailMultiplier}" style="padding:7px"></label></div><div class="card"><small>İnternet satış fiyatı</small><div class="value">${money(cost*number(state.onlineMultiplier))}</div><label class="muted" style="display:grid;gap:4px;margin-top:8px">Maliyet çarpanı<input data-candle-price-factor="onlineMultiplier" type="number" min="0" step="0.01" value="${state.onlineMultiplier}" style="padding:7px"></label></div></div>`;
+      };
+      paint();
+      document.addEventListener('input',event=>{
+        const input=event.target.closest?.('[data-candle-price-factor]');
+        if(!input)return;
+        let state=defaults;try{state={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+        state[input.dataset.candlePriceFactor]=number(input.value);
+        localStorage.setItem(key,JSON.stringify(state));
+        const cost=number(state.wickCost)+number(state.jarCost)+(number(state.mouldWater)*number(state.waxFactor)*(number(state.purchasePrice)/number(state.purchaseQuantity)));
+        const card=input.closest('.card');
+        const output=card?.querySelector('.value');
+        if(output)output.textContent=money(cost*number(state[input.dataset.candlePriceFactor]));
+      },true);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
