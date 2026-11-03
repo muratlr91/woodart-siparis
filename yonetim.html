@@ -80,6 +80,29 @@
       render();
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const root=document.querySelector('#fiyat');
+      const tabs=root?.querySelector('.cost-tabs');
+      if(!root||!tabs||tabs.querySelector('[data-cost-tab="candle"]'))return;
+      const tab=document.createElement('button');
+      const pane=document.createElement('div');
+      tab.type='button';
+      tab.className='cost-tab';
+      tab.dataset.costTab='candle';
+      tab.textContent='4. Mum';
+      pane.className='cost-pane';
+      pane.dataset.costPane='candle';
+      pane.innerHTML='<section class="panel" style="max-width:900px;border-left:5px solid #b57419;background:#fff9ed"><div class="panel-head"><div><h2>Mum maliyet hesabı</h2><span class="muted">Mum Excel dosyası geldiğinde hesaplama tablosu buraya birebir aktarılacak.</span></div><span class="badge orange">Excel bekleniyor</span></div><div class="two"><div class="card"><strong>Planlanan alanlar</strong><p class="muted" style="line-height:1.6;margin:8px 0 0">Mum, esans, boya, fitil, kap / kutu, etiket, işçilik, fire ve satış fiyatı hesapları.</p></div><div class="card"><strong>Toplu kullanım</strong><p class="muted" style="line-height:1.6;margin:8px 0 0">Excel al / ver bölümü ve ürün bazlı fiyat güncellemesi eklenecek.</p></div></div></section>';
+      tabs.appendChild(tab);
+      tabs.parentElement.appendChild(pane);
+      tab.addEventListener('click',()=>{
+        root.querySelectorAll('[data-cost-tab],[data-cost-pane]').forEach(item=>item.classList.remove('active'));
+        tab.classList.add('active');
+        pane.classList.add('active');
+      });
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
