@@ -156,6 +156,26 @@
       },true);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const key='woodart-mum-maliyet-v1';
+      const defaults={purchasePrice:170,purchaseQuantity:1000,wickCost:5,jarCost:5,mouldWater:50,waxFactor:.9};
+      const number=value=>Number(value)||0;
+      const money=value=>'₺ '+number(value).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const paint=()=>{
+        const pane=document.querySelector('[data-cost-pane="candle"]');
+        const summary=pane?.querySelector('section.panel > .panel:last-child');
+        if(!summary)return;
+        let state=defaults;try{state={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+        const cost=number(state.wickCost)+number(state.jarCost)+(number(state.mouldWater)*number(state.waxFactor)*(number(state.purchasePrice)/number(state.purchaseQuantity)));
+        summary.id='candle-price-summary';
+        summary.style.cssText='margin:16px 0 0;background:#fff;border:1px solid #d7dfd9';
+        summary.innerHTML=`<div class="panel-head"><div><h2>Satış fiyatları</h2><span class="muted">Maliyet üzerinden otomatik hesaplanır.</span></div></div><div style="display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px"><div class="card"><small>Maliyet</small><div class="value">${money(cost)}</div></div><div class="card"><small>Minimum satış fiyatı</small><div class="value">${money(cost*2.5)}</div><small>Maliyet × 2,5</small></div><div class="card"><small>İnternet satış fiyatı</small><div class="value">${money(cost*5)}</div><small>Maliyet × 5</small></div></div>`;
+      };
+      paint();
+      document.addEventListener('input',event=>{if(event.target.closest?.('[data-candle]'))setTimeout(paint,0)},true);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
