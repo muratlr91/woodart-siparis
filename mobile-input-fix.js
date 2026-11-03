@@ -1,30 +1,18 @@
-/* Android Chrome ve PWA'da alanlara dokunulduğunda klavyeyi açar. */
+/* Form alanlarını tarayıcının doğal mobil klavye davranışına bırakır. */
 (() => {
-  const isEditable = (node) => {
-    const field = node?.closest?.('input, textarea, select, [contenteditable="true"]');
-    if (!field || field.disabled || field.readOnly || field.getAttribute('aria-disabled') === 'true') return null;
-    if (field.matches?.('input[type="hidden"], input[type="button"], input[type="submit"], input[type="reset"], input[type="checkbox"], input[type="radio"], input[type="file"]')) return null;
-    return field;
-  };
-
-  const focusFromTouch = (event) => {
-    const field = isEditable(event.target);
-    if (!field || document.activeElement === field) return;
-    try { field.focus({ preventScroll: false }); }
-    catch (_) { field.focus(); }
-  };
-
-  // Android klavyeyi sadece gerçek kullanıcı dokunuşu sırasında açar.
-  // Bu nedenle odak, gecikmeden yakalama aşamasında verilir.
-  ['pointerdown', 'touchstart', 'mousedown', 'click'].forEach(type =>
-    document.addEventListener(type, focusFromTouch, true)
-  );
-
   const applyMobileFormRules = () => {
     const style = document.createElement('style');
     style.id = 'woodart-mobile-form-rules';
-    style.textContent = '@media (pointer:coarse){input:not([type="hidden"]),textarea,select,[contenteditable="true"]{pointer-events:auto!important;touch-action:manipulation!important;-webkit-user-select:text!important;user-select:text!important;-webkit-tap-highlight-color:rgba(0,0,0,.08)}}';
+    style.textContent = '@media (max-width:760px){input,textarea,select{font-size:16px!important;touch-action:auto;-webkit-user-select:text;user-select:text}}';
     document.head?.appendChild(style);
+
+    document.querySelectorAll('input').forEach(field => {
+      if (field.disabled || field.readOnly || field.type === 'hidden') return;
+      if (field.type === 'number' && !field.inputMode) field.inputMode = 'decimal';
+      if (field.type === 'search' && !field.inputMode) field.inputMode = 'search';
+      if (field.type === 'tel' && !field.inputMode) field.inputMode = 'tel';
+      if (field.type === 'email' && !field.inputMode) field.inputMode = 'email';
+    });
   };
 
   if (document.head) applyMobileFormRules();
