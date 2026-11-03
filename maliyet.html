@@ -26,6 +26,34 @@
       labelRows();
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      let timer;
+      const publish=()=>{
+        clearTimeout(timer);
+        timer=setTimeout(()=>{
+          try{window.parent?.woodartSaveCostWorkbook?.(localStorage.getItem('woodart-kitap121-exact-v2')||'')}catch(error){}
+        },700);
+      };
+      document.addEventListener('input',event=>{if(event.target.matches('[data-cell],[data-rate]'))publish()},true);
+      document.addEventListener('change',event=>{if(event.target.matches('[data-cell],[data-rate]'))publish()},true);
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const anchor=document.querySelector('#exact-sync');
+      if(!anchor||document.querySelector('#cost-cloud-sync'))return;
+      const button=document.createElement('button');
+      button.id='cost-cloud-sync';button.type='button';button.className='button secondary';button.textContent='Buluta eşitle';
+      button.addEventListener('click',async()=>{
+        button.disabled=true;button.textContent='Eşitleniyor...';
+        const ok=await window.parent?.woodartSaveCostWorkbook?.(localStorage.getItem('woodart-kitap121-exact-v2')||'');
+        button.textContent=ok?'Buluta kaydedildi':'Önce yönetici girişi yapın';
+        setTimeout(()=>{button.disabled=false;button.textContent='Buluta eşitle'},2200);
+      });
+      anchor.after(button);
+    });
+  </script>
 </head>
 <body><style>.table-wrap{overflow:visible}.cost-table{min-width:0;width:100%;table-layout:fixed;font-size:11px}.cost-table th,.cost-table td{padding:6px 3px;white-space:normal;overflow-wrap:anywhere}.cost-table input,.cost-table select{min-width:0!important;width:100%;padding:6px 4px;font-size:11px}.cost-table img{width:34px;height:34px;margin:auto}.cost-table .name{min-width:0}.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(n+5):nth-child(-n+9){width:10%}.cost-table th:nth-child(n+10){width:7%}@media(max-width:850px){.wrap{padding:0 4px}.card{padding:8px}.cost-table{font-size:8px}.cost-table th,.cost-table td{padding:3px 1px}.cost-table input,.cost-table select{padding:3px 1px;font-size:9px}.cost-table img{width:22px;height:22px}}</style>
 <style>.cost-table th:nth-child(1){width:4%}.cost-table th:nth-child(2){width:6%}.cost-table th:nth-child(3){width:12%}.cost-table th:nth-child(4){width:8%}.cost-table th:nth-child(5),.cost-table th:nth-child(6),.cost-table th:nth-child(7){width:10%}.cost-table th:nth-child(8),.cost-table th:nth-child(9){width:8%}.cost-table th:nth-child(10),.cost-table th:nth-child(11),.cost-table th:nth-child(12){width:8%}.cost-table th{text-align:center;line-height:1.15}.cost-table td:nth-child(1),.cost-table td:nth-child(2){text-align:center}.cost-table td:nth-child(3){text-align:left}.cost-table td:nth-child(n+4){text-align:center}.cost-table td.result{text-align:right}</style><main class="wrap">

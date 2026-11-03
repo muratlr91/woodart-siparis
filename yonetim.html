@@ -229,6 +229,38 @@
       #fiyat [data-cost-pane="candle"] .card{padding:13px}
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const costKey='woodart-kitap121-exact-v2';
+      const currentCloudSave=window.woodartCloudSave;
+      window.woodartCloudSave=async()=>{
+        try{const workbook=JSON.parse(localStorage.getItem(costKey)||'null');if(workbook)data.costWorkbook=workbook}catch(error){}
+        return currentCloudSave?.();
+      };
+      window.woodartSaveCostWorkbook=async workbook=>{
+        try{
+          const parsed=typeof workbook==='string'?JSON.parse(workbook):workbook;
+          if(!parsed)return false;
+          localStorage.setItem(costKey,JSON.stringify(parsed));
+          data.costWorkbook=parsed;
+          return await window.woodartCloudSave();
+        }catch(error){return false}
+      };
+      let applied=false;
+      const applyRemoteWorkbook=()=>{
+        if(applied||window.__woodartRemoteLoading||!data?.costWorkbook)return;
+        applied=true;
+        const remote=JSON.stringify(data.costWorkbook),local=localStorage.getItem(costKey);
+        if(remote===local)return;
+        localStorage.setItem(costKey,remote);
+        const frame=document.querySelector('#fiyat iframe');
+        if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now();
+        window.renderCostStocks?.();
+      };
+      const timer=setInterval(()=>{applyRemoteWorkbook();if(applied)clearInterval(timer)},500);
+      setTimeout(applyRemoteWorkbook,0);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
