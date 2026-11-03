@@ -103,6 +103,59 @@
       });
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const pane=document.querySelector('[data-cost-pane="candle"]');
+      if(!pane)return;
+      const key='woodart-mum-maliyet-v1';
+      let state={purchasePrice:170,purchaseQuantity:1000,wickCost:5,jarCost:5,mouldWater:50,waxFactor:.9};
+      try{state={...state,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+      const number=value=>Number(value)||0;
+      const money=value=>'₺ '+number(value).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const render=()=>{
+        const gramCost=number(state.purchasePrice)/number(state.purchaseQuantity);
+        const waxUsage=number(state.mouldWater)*number(state.waxFactor);
+        const waxCost=waxUsage*gramCost;
+        const total=number(state.wickCost)+number(state.jarCost)+waxCost;
+        pane.innerHTML=`<section class="panel" style="max-width:1050px;border-left:5px solid #b57419;background:#fff9ed"><div class="panel-head"><div><h2>Mum obje fiyatı</h2><span class="muted">Fitil + kap + (mum tüketim miktarı × mum gram maliyeti)</span></div><strong style="font-size:28px;color:#9b5b11" data-candle-total>${money(total)}</strong></div><div style="display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px"><div class="field"><label>Alınan fiyat (₺)</label><input data-candle="purchasePrice" type="number" min="0" step="0.01" value="${state.purchasePrice}"></div><div class="field"><label>Alınan miktar (gr)</label><input data-candle="purchaseQuantity" type="number" min="0.01" step="0.01" value="${state.purchaseQuantity}"></div><div class="card"><small>Mum gram maliyeti</small><div class="value" data-candle-gram>${money(gramCost)}</div></div><div class="field"><label>Fitil maliyeti (₺)</label><input data-candle="wickCost" type="number" min="0" step="0.01" value="${state.wickCost}"></div><div class="field"><label>Kap maliyeti (₺)</label><input data-candle="jarCost" type="number" min="0" step="0.01" value="${state.jarCost}"></div><div class="field"><label>Kalıbın su dolu ağırlığı (gr)</label><input data-candle="mouldWater" type="number" min="0" step="0.01" value="${state.mouldWater}"></div><div class="field"><label>Mum çarpanı</label><input data-candle="waxFactor" type="number" min="0" step="0.01" value="${state.waxFactor}"></div><div class="card"><small>Mum tüketim miktarı</small><div class="value" data-candle-usage>${waxUsage.toLocaleString('tr-TR',{maximumFractionDigits:2})} gr</div></div><div class="card"><small>Mum maliyeti</small><div class="value" data-candle-wax>${money(waxCost)}</div></div></div><div class="panel" style="margin:16px 0 0;background:#fff;border:1px dashed #b57419"><strong>Hesaplama</strong><div class="muted" style="margin-top:8px">${money(state.wickCost)} fitil + ${money(state.jarCost)} kap + (${waxUsage.toLocaleString('tr-TR',{maximumFractionDigits:2})} gr × ${money(gramCost)}) = <strong>${money(total)}</strong></div></div></section>`;
+      };
+      pane.addEventListener('input',event=>{
+        const input=event.target.closest('[data-candle]');
+        if(!input)return;
+        state[input.dataset.candle]=number(input.value);
+        localStorage.setItem(key,JSON.stringify(state));
+        render();
+      });
+      render();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const key='woodart-mum-maliyet-v1';
+      const defaults={purchasePrice:170,purchaseQuantity:1000,wickCost:5,jarCost:5,mouldWater:50,waxFactor:.9};
+      const number=value=>Number(value)||0;
+      const money=value=>'₺ '+number(value).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const update=pane=>{
+        let state=defaults;try{state={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+        const gramCost=number(state.purchasePrice)/number(state.purchaseQuantity),waxUsage=number(state.mouldWater)*number(state.waxFactor),waxCost=waxUsage*gramCost,total=number(state.wickCost)+number(state.jarCost)+waxCost;
+        pane.querySelector('[data-candle-total]')?.replaceChildren(document.createTextNode(money(total)));
+        pane.querySelector('[data-candle-gram]')?.replaceChildren(document.createTextNode(money(gramCost)));
+        pane.querySelector('[data-candle-usage]')?.replaceChildren(document.createTextNode(waxUsage.toLocaleString('tr-TR',{maximumFractionDigits:2})+' gr'));
+        pane.querySelector('[data-candle-wax]')?.replaceChildren(document.createTextNode(money(waxCost)));
+        const formula=pane.querySelector('.panel:last-child .muted');
+        if(formula)formula.innerHTML=`${money(state.wickCost)} fitil + ${money(state.jarCost)} kap + (${waxUsage.toLocaleString('tr-TR',{maximumFractionDigits:2})} gr × ${money(gramCost)}) = <strong>${money(total)}</strong>`;
+      };
+      document.addEventListener('input',event=>{
+        const input=event.target.closest?.('[data-candle]');
+        if(!input)return;
+        event.stopImmediatePropagation();
+        let state=defaults;try{state={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(error){}
+        state[input.dataset.candle]=number(input.value);
+        localStorage.setItem(key,JSON.stringify(state));
+        update(input.closest('[data-cost-pane="candle"]'));
+      },true);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
