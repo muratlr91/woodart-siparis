@@ -10,7 +10,7 @@
 <body>
   <main class="box"><div class="spin"></div><h1>Woodart güncelleniyor</h1><p>Eski uygulama önbelleği temizleniyor. Yönetim paneli birazdan açılacak.</p></main>
   <script>
-    (async()=>{try{if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(registration=>registration.unregister()))}if('caches'in window){const names=await caches.keys();await Promise.all(names.filter(name=>name.startsWith('woodart-')).map(name=>caches.delete(name)))}}finally{location.replace('yonetim.html?sayfa=maliyet&yenile='+Date.now())}})();
+    (async()=>{try{if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(registration=>registration.unregister()))}if('caches'in window){const names=await caches.keys();await Promise.all(names.filter(name=>name.startsWith('woodart-')).map(name=>caches.delete(name)))}}finally{location.replace('yonetim.html?yenile='+Date.now())}})();
   </script>
 </body>
 </html>
