@@ -302,6 +302,54 @@
       setTimeout(refreshCostPageAfterCloudLoad,0);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const stores={exact:'woodart-kitap121-exact-v2',candle:'woodart-mum-maliyet-v1',laser:'woodart-lazer-malzemeler-v1',laserLegacy:'woodart-lazer-kesim-v1',rules:'woodart-cost-rules-v3'};
+      const read=key=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch(error){return null}};
+      const collect=()=>Object.fromEntries(Object.entries(stores).map(([name,key])=>[name,read(key)]));
+      const apply=bundle=>Object.entries(bundle||{}).forEach(([name,value])=>{if(value&&stores[name])localStorage.setItem(stores[name],JSON.stringify(value))});
+      const earlierCloudSave=window.woodartCloudSave;
+      const saveAll=async()=>{
+        const workspace=collect();
+        data.costWorkspace=workspace;
+        if(workspace.exact)data.costWorkbook=workspace.exact;
+        return earlierCloudSave?.();
+      };
+      window.woodartCloudSave=saveAll;
+      window.woodartSaveCostWorkbook=async workbook=>{
+        try{const value=typeof workbook==='string'?JSON.parse(workbook):workbook;if(value)localStorage.setItem(stores.exact,JSON.stringify(value))}catch(error){}
+        return saveAll();
+      };
+      window.woodartSaveAllCostData=saveAll;
+      window.woodartReloadCostWorkbook=async()=>{
+        try{
+          const response=await cloudFetch('/rest/v1/panel_state?select=data&id=eq.1');
+          if(!response.ok)throw new Error('Bulut verisi alınamadı');
+          const rows=await response.json(),remote=rows[0]?.data||{};
+          apply(remote.costWorkspace||{exact:remote.costWorkbook});
+          const frame=document.querySelector('#fiyat iframe');
+          if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now();
+          return Boolean(remote.costWorkspace||remote.costWorkbook);
+        }catch(error){console.warn('Maliyet verisi alınamadı',error);return false}
+      };
+      let timer;
+      const queueSave=()=>{clearTimeout(timer);timer=setTimeout(()=>void saveAll(),900)};
+      document.addEventListener('input',event=>{if(event.target.closest?.('[data-candle],[data-candle-price-factor]'))queueSave()},true);
+      document.addEventListener('change',event=>{if(event.target.matches?.('[data-laser-global],[data-laser-field]'))queueSave()},true);
+      document.addEventListener('click',event=>{if(event.target.closest?.('[data-laser-add],[data-laser-remove]'))setTimeout(queueSave,0)},true);
+      let remoteApplied=false;
+      const applyRemote=()=>{
+        if(remoteApplied||!cloudToken||window.__woodartRemoteLoading)return;
+        const workspace=data?.costWorkspace||{exact:data?.costWorkbook};
+        if(!workspace||!Object.values(workspace).some(Boolean))return;
+        remoteApplied=true;apply(workspace);
+        const frame=document.querySelector('#fiyat iframe');
+        if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now();
+      };
+      const interval=setInterval(()=>{applyRemote();if(remoteApplied)clearInterval(interval)},400);
+      setTimeout(applyRemote,0);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
