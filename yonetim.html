@@ -287,6 +287,21 @@
       #laser-material-list [data-laser-material] .field,#laser-material-list [data-laser-material] input{min-width:0!important;width:100%!important}
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const costKey='woodart-kitap121-exact-v2';
+      let refreshed=false;
+      const refreshCostPageAfterCloudLoad=()=>{
+        if(refreshed||!cloudToken||window.__woodartRemoteLoading)return;
+        refreshed=true;
+        try{if(data?.costWorkbook)localStorage.setItem(costKey,JSON.stringify(data.costWorkbook))}catch(error){}
+        const frame=document.querySelector('#fiyat iframe');
+        if(frame)frame.src='maliyet.html?embedded=1&yenile='+Date.now();
+      };
+      const timer=setInterval(()=>{refreshCostPageAfterCloudLoad();if(refreshed)clearInterval(timer)},400);
+      setTimeout(refreshCostPageAfterCloudLoad,0);
+    });
+  </script>
 </head>
 <body>
 <div class="shell">
